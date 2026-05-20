@@ -28,7 +28,7 @@ func greetHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	if lang == "es"{
-		fmt.Fprintln(w, "Hello %v", name)
+		fmt.Fprintln(w, "Halo %v", name)
 	}else{
 		fmt.Fprintf(w, "Hello %v", name)
 	}
