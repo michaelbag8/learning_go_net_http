@@ -19,9 +19,9 @@ func contactHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func greetHandler(w http.ResponseWriter, r *http.Request){
-	name := r.URL.Query().Get("param")
+	name := r.URL.Query().Get("name")
 
-	lang := r.URL.Query().Get("param")
+	lang := r.URL.Query().Get("lang")
 
 	if name == ""{
 		name = "Guest!"
