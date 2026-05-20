@@ -7,69 +7,71 @@ import (
 	"strings"
 )
 
-func homeHandler(w http.ResponseWriter, r *http.Request){
+func homeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Home Page"))
 }
 
-func aboutHandler(w http.ResponseWriter, r *http.Request){
+func aboutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("About Page"))
 }
 
-func contactHandler(w http.ResponseWriter, r *http.Request){
+func contactHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Contact Page"))
 }
 
-func greetHandler(w http.ResponseWriter, r *http.Request){
+func greetHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	lang := r.URL.Query().Get("lang")
 
-	if name == ""{
+	if name == "" {
 		name = "Guest"
 	}
 
-	if lang == "es"{
+	if lang == "es" {
 		fmt.Fprintf(w, "Hola %s", name)
-	}else{
+	} else {
 		fmt.Fprintf(w, "Hello %s", name)
 	}
-	
+
 }
 
-func farewellHandler(w http.ResponseWriter, r *http.Request){
+func farewellHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	lang := r.URL.Query().Get("lang")
 
-	if name == ""{
+	if name == "" {
 		name = "Guest"
 	}
 
-	if lang == "es"{
+	if lang == "es" {
 		fmt.Fprintf(w, "Adiós, %s", name)
-	}else{
+	} else {
 		fmt.Fprintf(w, "Goodbye, %s", name)
 	}
 }
 
-
-func getUserIdHandler(w http.ResponseWriter, r *http.Request){
-	path :=r.URL.Path
+func getUserIdHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("name")
+	path := r.URL.Path
 
 	parts := strings.Split(path, "/")
 
-	if len(parts) < 3{
+	if len(parts) < 3 {
 		http.Error(w, "User ID not provided", http.StatusBadRequest)
 		return
 	}
 
+	//"User ID: 123, Name: Michael"
 	userID := parts[2]
-	fmt.Fprintf(w, "User ID: %s", userID)
+	if userID != "" {
+		fmt.Fprintf(w, "User ID: %s, Name: %s", userID, name)
+	}
+
 }
 
-
-
-func main(){
+func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/about", aboutHandler)
 	http.HandleFunc("/contact", contactHandler)
@@ -77,7 +79,7 @@ func main(){
 	http.HandleFunc("/greet", greetHandler)
 	http.HandleFunc("/users/", getUserIdHandler)
 
-	if err := http.ListenAndServe(":9090", nil); err != nil{
-		log.Fatal("Server failed to start: ",err)
+	if err := http.ListenAndServe(":9090", nil); err != nil {
+		log.Fatal("Server failed to start: ", err)
 	}
 }
