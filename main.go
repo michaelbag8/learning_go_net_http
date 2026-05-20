@@ -16,6 +16,7 @@ func aboutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
+
 	w.Write([]byte("Contact Page"))
 }
 
@@ -53,31 +54,58 @@ func farewellHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserIdHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
 	path := r.URL.Path
-
 	parts := strings.Split(path, "/")
 
 	if len(parts) < 3 {
-		http.Error(w, "User ID not provided", http.StatusBadRequest)
+		http.Error(w, "Expected format: /users/{id}", http.StatusBadRequest)
 		return
 	}
 
-	//"User ID: 123, Name: Michael"
 	userID := parts[2]
-	if userID != "" {
-		fmt.Fprintf(w, "User ID: %s, Name: %s", userID, name)
-	}
 
+	switch userID {
+	case "123":
+		fmt.Fprintf(w, "User ID: %s, Name: Michael", userID)
+	case "456":
+		fmt.Fprintf(w, "User ID: %s, Name: Sarah", userID)
+	default:
+		fmt.Fprintf(w, "User ID: %s, Name: Unknown", userID)
+	}
 }
 
+func getUsers(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	method := r.Method
+
+	switch method {
+	case "POST":
+		fmt.Fprintln(w, `{"message": "Creating a user"}`)
+	case "GET":
+		fmt.Fprintln(w, `{"message": "Listing all users"}`)
+
+	case "PUT":
+		fmt.Fprintln(w, `{"message": "Updating a user"}`)
+
+	case "DELETE":
+		fmt.Fprintln(w, `{"message": "Deleting a user"}`)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
 func main() {
+
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/about", aboutHandler)
 	http.HandleFunc("/contact", contactHandler)
 	http.HandleFunc("/farewell", farewellHandler)
 	http.HandleFunc("/greet", greetHandler)
 	http.HandleFunc("/users/", getUserIdHandler)
+	http.HandleFunc("/user", getUsers)
+
+	fmt.Println("server is runing ......http://localhost:9090")
 
 	if err := http.ListenAndServe(":9090", nil); err != nil {
 		log.Fatal("Server failed to start: ", err)
