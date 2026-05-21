@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -74,6 +75,25 @@ func getUserIdHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func createUser(w http.ResponseWriter, r *http.Request){
+	if r.Method != "POST"{
+		http.Error(w, "Method is not allowed", http.StatusBadRequest)
+		return
+	}
+
+	type User struct{
+		Name string `json:"name"`
+	}
+
+	var user User
+	if err := json.NewDecoder(r.Body).Decode(&user); err!=nil{
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, `{"Message: %s created"}`, user.Name)
+}
+
 func getUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
@@ -104,6 +124,7 @@ func main() {
 	http.HandleFunc("/greet", greetHandler)
 	http.HandleFunc("/users/", getUserIdHandler)
 	http.HandleFunc("/user", getUsers)
+	http.HandleFunc("/createuser", createUser)
 
 	fmt.Println("server is runing ......http://localhost:9090")
 
