@@ -77,7 +77,7 @@ func getUserIdHandler(w http.ResponseWriter, r *http.Request) {
 
 func createUser(w http.ResponseWriter, r *http.Request){
 	if r.Method != "POST"{
-		http.Error(w, "Method is not allowed", http.StatusBadRequest)
+		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -88,10 +88,11 @@ func createUser(w http.ResponseWriter, r *http.Request){
 	var user User
 	if err := json.NewDecoder(r.Body).Decode(&user); err!=nil{
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, `{"Message: %s created"}`, user.Name)
+	fmt.Fprintf(w, `{"Message": "User %s created"}`, user.Name)
 }
 
 func getUsers(w http.ResponseWriter, r *http.Request) {
