@@ -15,6 +15,12 @@ type User struct {
 	Role  string `json:"role"`
 }
 
+type RegisterRequest struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 // ─── Helper ──────────────────────────────────────────
 func writeJSON(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -41,7 +47,7 @@ func missingHandler(w http.ResponseWriter, r *http.Request) {
 
 func createdHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, map[string]any{
-		"message": "user created successfully", 
+		"message": "user created successfully",
 		"id":      345,
 	})
 }
@@ -62,7 +68,7 @@ func greetHandler(w http.ResponseWriter, r *http.Request) {
 		name = "World"
 	}
 
-	switch strings.ToLower(language) { 
+	switch strings.ToLower(language) {
 	case "french":
 		fmt.Fprintf(w, "Bonjour, %s!\n", name)
 	case "spanish":
@@ -76,6 +82,57 @@ func aboutHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "This is the about page")
 }
 
+func profileHandler(w http.ResponseWriter, r *http.Request) {
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		username = "Guest"
+	}
+	appVersion := r.Header.Get("X-App-Version")
+
+	
+		writeJSON(w, http.StatusOK, map[string]string{
+			"username":    username,
+			"app_version": appVersion,
+			"message":     "profile fetched successfully",
+		})
+		
+	}
+
+
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]string{
+			"error": "method not allowed",
+		})
+		return
+
+	}
+
+	defer r.Body.Close()
+
+	var req RegisterRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "invalid request body",
+		})
+		return
+	}
+
+	if req.Name == "" || req.Email == "" || req.Password == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "all fields are required",
+		})
+		return
+	}
+	writeJSON(w, http.StatusCreated, map[string]any{
+		"message": "registration successful",
+		"name":    req.Name,
+		"email":   req.Email,
+	})
+
+}
+
 // ─── Main ────────────────────────────────────────────
 func main() {
 	http.HandleFunc("/hello", helloHandler)
@@ -84,6 +141,8 @@ func main() {
 	http.HandleFunc("/user", getUserHandler)
 	http.HandleFunc("/missing", missingHandler)
 	http.HandleFunc("/created", createdHandler)
+	http.HandleFunc("/profile", profileHandler)
+	http.HandleFunc("/register", registerHandler)
 
 	fmt.Println("Server is running at http://localhost:8080/")
 	if err := http.ListenAndServe(":8080", nil); err != nil {

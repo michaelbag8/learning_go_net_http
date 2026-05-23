@@ -103,8 +103,6 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	resp := Response{Message: fmt.Sprintf("User %s created", user.Name)}
 
-
-	
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
 		return
