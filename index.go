@@ -89,15 +89,13 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	appVersion := r.Header.Get("X-App-Version")
 
-	
-		writeJSON(w, http.StatusOK, map[string]string{
-			"username":    username,
-			"app_version": appVersion,
-			"message":     "profile fetched successfully",
-		})
-		
-	}
+	writeJSON(w, http.StatusOK, map[string]string{
+		"username":    username,
+		"app_version": appVersion,
+		"message":     "profile fetched successfully",
+	})
 
+}
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
